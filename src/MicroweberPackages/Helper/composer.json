@@ -1,0 +1,34 @@
+{
+    "name": "depexor-packages/depexor-helpers",
+    "description": "PHP helper functions.",
+    "version" : "0.0.7",
+    "authors": [
+        {
+            "name": "depexor",
+            "email": "info@depexor.com"
+        },
+		{
+            "name": "Bozhidar Slaveykov",
+            "email": "bobi@depexor.com"
+        }
+  ],
+
+   "autoload": {
+    "psr-4": {
+      "depexorPackages\\Helper\\": ""
+    },
+     "files": [
+       "functions/array.php",
+       "functions/filesystem.php",
+       "functions/laravel.php",
+       "functions/string.php",
+       "functions/system.php",
+       "functions/url.php"
+     ]
+  },
+  "homepage": "http://depexor.com",
+  "license": "MIT",
+  "support": {
+    "email": "support@depexor.com"
+  }
+}

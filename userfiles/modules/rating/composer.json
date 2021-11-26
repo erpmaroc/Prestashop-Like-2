@@ -1,0 +1,17 @@
+{
+  "name": "depexor-modules/rating",
+  "description": "Rating",
+  "license": "MIT",
+  "homepage": "https://depexor.org/modules/depexor-modules/rating",
+  "authors": [
+    {
+      "name": "Bozhidar Slaveykov",
+      "email": "bobi@depexor.com"
+    }
+  ],
+  "keywords": [
+    "rating"
+  ],
+  "type": "depexor-module",
+  "target-dir": "rating"
+}

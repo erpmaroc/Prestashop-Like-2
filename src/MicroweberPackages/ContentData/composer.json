@@ -1,0 +1,34 @@
+{
+  "name": "depexor-packages/depexor-content-data",
+  "description": "depexor Content Data",
+  "version": "0.0.1",
+  "authors": [
+    {
+      "name": "depexor",
+      "email": "info@depexor.com"
+    },
+    {
+      "name": "Bozhidar Slaveykov",
+      "email": "bobi@depexor.com"
+    }
+  ],
+  "autoload": {
+    "psr-4": {
+      "depexorPackages\\ContentData\\": ""
+    }
+  },
+  "extra": {
+    "laravel": {
+      "providers": [
+        "depexorPackages\\ContentData\\ContentDataServiceProvider"
+      ]
+    }
+  },
+  "minimum-stability": "dev",
+  "prefer-stable": true,
+  "homepage": "http://depexor.org",
+  "license": "MIT",
+  "support": {
+    "email": "support@depexor.com"
+  }
+}

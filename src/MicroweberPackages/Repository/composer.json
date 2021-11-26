@@ -1,0 +1,21 @@
+{
+    "name": "depexor-packages/depexor-repository",
+    "description": "Repository container",
+    "version" : "0.0.1",
+    "authors": [
+        {
+            "name": "depexor",
+            "email": "info@depexor.com"
+        }
+  ],
+  "autoload": {
+      "psr-4": {
+        "depexorPackages\\Repository\\": ""
+      }
+  },
+  "homepage": "http://depexor.org",
+  "license": "MIT",
+  "support": {
+    "email": "support@depexor.com"
+  }
+}

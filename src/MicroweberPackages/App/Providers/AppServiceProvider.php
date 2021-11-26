@@ -1,0 +1,654 @@
+<?php
+
+namespace depexorPackages\App\Providers;
+
+use Hamcrest\Core\Is;
+use Illuminate\Foundation\AliasLoader;
+use Illuminate\Support\Facades\Config;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\URL;
+use Illuminate\Support\Facades\View;
+use Illuminate\Support\ServiceProvider;
+use Jenssegers\Agent\Agent;
+use depexorPackages\Admin\AdminServiceProvider;
+use depexorPackages\App\Managers\Helpers\Lang;
+use depexorPackages\App\Utils\Parser;
+use depexorPackages\Backup\Providers\BackupServiceProvider;
+use depexorPackages\Blog\BlogServiceProvider;
+use depexorPackages\Comment\CommentServiceProvider;
+use depexorPackages\ContentFilter\Providers\ContentFilterServiceProvider;
+use depexorPackages\Customer\Providers\CustomerEventServiceProvider;
+use depexorPackages\Customer\Providers\CustomerServiceProvider;
+use depexorPackages\Debugbar\DebugbarServiceProvider;
+use depexorPackages\Dusk\DuskServiceProvider;
+use depexorPackages\Media\Models\Media;
+use depexorPackages\Multilanguage\MultilanguageServiceProvider;
+use depexorPackages\Notification\Providers\NotificationServiceProvider;
+use depexorPackages\Offer\Providers\OfferServiceProvider;
+use depexorPackages\Order\Providers\OrderEventServiceProvider;
+use depexorPackages\Queue\Providers\QueueEventServiceProvider;
+use depexorPackages\Queue\Providers\QueueServiceProvider;
+use depexorPackages\Repository\Providers\RepositoryEventServiceProvider;
+use depexorPackages\Repository\Providers\RepositoryServiceProvider;
+use depexorPackages\Shipping\ShippingManagerServiceProvider;
+use depexorPackages\Shop\ShopServiceProvider;
+use depexorPackages\Translation\Providers\TranslationServiceProvider;
+use depexorPackages\User\Providers\UserEventServiceProvider;
+use depexorPackages\Cart\Providers\CartEventServiceProvider;
+use depexorPackages\User\Providers\UserServiceProvider;
+use depexorPackages\Category\Providers\CategoryEventServiceProvider;
+use depexorPackages\Category\Providers\CategoryServiceProvider;
+use depexorPackages\Config\ConfigSave;
+use depexorPackages\Content\Content;
+use depexorPackages\Content\ContentManagerServiceProvider;
+use depexorPackages\Content\ContentServiceProvider;
+use depexorPackages\ContentData\Providers\ContentDataEventServiceProvider;
+use depexorPackages\ContentData\Providers\ContentDataServiceProvider;
+use depexorPackages\Country\CountryServiceProvider;
+use depexorPackages\CustomField\Providers\CustomFieldServiceProvider;
+use depexorPackages\CustomField\Providers\CustomFieldEventServiceProvider;
+use depexorPackages\Database\DatabaseManagerServiceProvider;
+use depexorPackages\Event\EventManagerServiceProvider;
+use depexorPackages\FileManager\FileManagerServiceProvider;
+use depexorPackages\Form\Providers\FormServiceProvider;
+use depexorPackages\Helper\Format;
+use depexorPackages\Helper\HelpersServiceProvider;
+use depexorPackages\Install\depexorMigrator;
+use depexorPackages\Media\MediaManagerServiceProvider;
+use depexorPackages\Menu\Providers\MenuEventServiceProvider;
+use depexorPackages\Menu\Providers\MenuServiceProvider;
+use depexorPackages\Module\ModuleServiceProvider;
+
+use depexorPackages\OpenApi\Providers\SwaggerServiceProvider;
+use depexorPackages\Option\Providers\OptionServiceProvider;
+
+// Shop
+use depexorPackages\Cart\CartManagerServiceProvider;
+use depexorPackages\Checkout\CheckoutManagerServiceProvider;
+use depexorPackages\Currency\CurrencyServiceProvider;
+use depexorPackages\Order\Providers\OrderServiceProvider;
+use depexorPackages\Page\PageServiceProvider;
+use depexorPackages\Post\PostServiceProvider;
+use depexorPackages\Product\ProductServiceProvider;
+use depexorPackages\Role\RoleServiceProvider;
+use depexorPackages\Shop\ShopManagerServiceProvider;
+use depexorPackages\Tax\TaxManagerServiceProvider;
+
+use depexorPackages\Tag\TagsManagerServiceProvider;
+use depexorPackages\Template\TemplateManagerServiceProvider;
+use depexorPackages\Utils\Captcha\Providers\CaptchaManagerServiceProvider;
+use depexorPackages\Utils\Http\Http;
+use depexorPackages\Utils\System\ClassLoader;
+use Spatie\Permission\PermissionServiceProvider;
+use depexorPackages\App\Http\Middleware\AuthenticateSessionForUser;
+
+if (!defined('MW_VERSION')) {
+    include_once dirname(__DIR__) . DIRECTORY_SEPARATOR . 'functions' . DIRECTORY_SEPARATOR . 'bootstrap.php';
+}
+
+class AppServiceProvider extends ServiceProvider
+{
+
+    protected $aliasInstance;
+
+    /*
+    * Application Service Providers...
+    */
+    public $laravel_providers = [
+
+        \Illuminate\Session\SessionServiceProvider::class,
+        //  \Illuminate\Filesystem\FilesystemServiceProvider::class,
+        \Illuminate\Auth\AuthServiceProvider::class,
+        \Illuminate\Broadcasting\BroadcastServiceProvider::class,
+        \Illuminate\Bus\BusServiceProvider::class,
+        \Illuminate\Cache\CacheServiceProvider::class,
+        \Illuminate\Foundation\Providers\ConsoleSupportServiceProvider::class,
+        \Illuminate\Cookie\CookieServiceProvider::class,
+        \Illuminate\Database\DatabaseServiceProvider::class,
+        \Illuminate\Encryption\EncryptionServiceProvider::class,
+        \Illuminate\Foundation\Providers\FoundationServiceProvider::class,
+        \Illuminate\Hashing\HashServiceProvider::class,
+        \Illuminate\Mail\MailServiceProvider::class,
+        \Illuminate\Notifications\NotificationServiceProvider::class,
+        \depexorPackages\Pagination\PaginationServiceProvider::class,
+        \Illuminate\Pipeline\PipelineServiceProvider::class,
+        \Illuminate\Queue\QueueServiceProvider::class,
+        \Illuminate\Redis\RedisServiceProvider::class,
+        \Illuminate\Auth\Passwords\PasswordResetServiceProvider::class,
+        \Illuminate\Translation\TranslationServiceProvider::class,
+        \Illuminate\Validation\ValidationServiceProvider::class,
+        \Illuminate\View\ViewServiceProvider::class,
+
+    ];
+
+    /*
+    |--------------------------------------------------------------------------
+    | Class Aliases
+    |--------------------------------------------------------------------------
+    |
+    | This array of class aliases will be registered when this application
+    | is started. However, feel free to register as many as you wish as
+    | the aliases are "lazy" loaded so they don't hinder performance.
+    |
+    */
+
+    public $laravel_aliases = [
+        'App' => \Illuminate\Support\Facades\App::class,
+        'Arr' => \Illuminate\Support\Arr::class,
+        'Artisan' => \Illuminate\Support\Facades\Artisan::class,
+        'Auth' => \Illuminate\Support\Facades\Auth::class,
+        'Blade' => \Illuminate\Support\Facades\Blade::class,
+        'Broadcast' => \Illuminate\Support\Facades\Broadcast::class,
+        'Bus' => \Illuminate\Support\Facades\Bus::class,
+        'Cache' => \Illuminate\Support\Facades\Cache::class,
+        'Config' => \Illuminate\Support\Facades\Config::class,
+        'Cookie' => \Illuminate\Support\Facades\Cookie::class,
+        'Crypt' => \Illuminate\Support\Facades\Crypt::class,
+        'DB' => \Illuminate\Support\Facades\DB::class,
+        'Eloquent' => \Illuminate\Database\Eloquent\Model::class,
+        'Event' => \Illuminate\Support\Facades\Event::class,
+        //  'File' => \Illuminate\Support\Facades\File::class,
+        'Gate' => \Illuminate\Support\Facades\Gate::class,
+        'Hash' => \Illuminate\Support\Facades\Hash::class,
+        'Http' => \Illuminate\Support\Facades\Http::class,
+        'Lang' => \Illuminate\Support\Facades\Lang::class,
+        'Log' => \Illuminate\Support\Facades\Log::class,
+        'Mail' => \Illuminate\Support\Facades\Mail::class,
+        'Notification' => \Illuminate\Support\Facades\Notification::class,
+        'Password' => \Illuminate\Support\Facades\Password::class,
+        'Queue' => \Illuminate\Support\Facades\Queue::class,
+        'Redirect' => \Illuminate\Support\Facades\Redirect::class,
+        'Redis' => \Illuminate\Support\Facades\Redis::class,
+        'Request' => \Illuminate\Support\Facades\Request::class,
+        'Response' => \Illuminate\Support\Facades\Response::class,
+        'Route' => \Illuminate\Support\Facades\Route::class,
+        'Schema' => \Illuminate\Support\Facades\Schema::class,
+          'Session' => \Illuminate\Support\Facades\Session::class,
+        'Storage' => \Illuminate\Support\Facades\Storage::class,
+        'Str' => \Illuminate\Support\Str::class,
+        'URL' => \Illuminate\Support\Facades\URL::class,
+        'Validator' => \Illuminate\Support\Facades\Validator::class,
+        'View' => \Illuminate\Support\Facades\View::class,
+        'PDF' => \Barryvdh\DomPDF\Facade::class
+    ];
+
+    public function __construct($app)
+    {
+        //$this->loadPackagesComposerJson();
+
+        ClassLoader::addDirectories([
+            base_path() . DIRECTORY_SEPARATOR . 'userfiles' . DIRECTORY_SEPARATOR . 'modules',
+            __DIR__,
+        ]);
+
+        ClassLoader::register();
+
+        spl_autoload_register([$this, 'autoloadModules']);
+
+        $this->aliasInstance = AliasLoader::getInstance();
+
+        parent::__construct($app);
+    }
+
+    public function register()
+    {
+        $this->registerLaravelProviders();
+        $this->registerLaravelAliases();
+        $this->setEnvironmentDetection();
+        $this->registerUtils();
+
+        $this->registerSingletonProviders();
+        $this->registerHtmlCollective();
+        $this->registerMarkdown();
+
+        $this->app->instance('config', new ConfigSave($this->app));
+
+        $this->app->register(RepositoryServiceProvider::class);
+        $this->app->register(RepositoryEventServiceProvider::class);
+        $this->app->register(MediaManagerServiceProvider::class);
+        $this->app->register(DebugbarServiceProvider::class);
+        $this->app->register(UserServiceProvider::class);
+        $this->app->register(ModuleServiceProvider::class);
+
+        if (!defined('ADMIN_PREFIX')) {
+            define('ADMIN_PREFIX', config('depexor.admin_url', 'admin'));
+        }
+
+        if (config::get('depexor.force_https') && !is_cli()) {
+            URL::forceScheme("https");
+        }
+            //   $this->app->register(TaggableFileCacheServiceProvider::class);
+        //$this->app->register(AlternativeCacheStoresServiceProvider::class);
+
+        $this->app->register(TranslationServiceProvider::class);
+        $this->app->register(TagsManagerServiceProvider::class);
+        $this->app->register('Conner\Tagging\Providers\TaggingServiceProvider');
+        $this->app->register(EventManagerServiceProvider::class);
+        $this->app->register(HelpersServiceProvider::class);
+        $this->app->register(PageServiceProvider::class);
+        $this->app->register(ContentServiceProvider::class);
+        $this->app->register(ContentManagerServiceProvider::class);
+        $this->app->register(CategoryServiceProvider::class);
+        $this->app->register(CategoryEventServiceProvider::class);
+        $this->app->register(MenuServiceProvider::class);
+        $this->app->register(MenuEventServiceProvider::class);
+        $this->app->register(ProductServiceProvider::class);
+        $this->app->register(PostServiceProvider::class);
+        $this->app->register(ContentDataServiceProvider::class);
+        $this->app->register(ContentDataEventServiceProvider::class);
+        $this->app->register(CustomFieldServiceProvider::class);
+        $this->app->register(CustomFieldEventServiceProvider::class);
+        $this->app->register(TemplateManagerServiceProvider::class);
+        $this->app->register(DatabaseManagerServiceProvider::class);
+
+        // Shop
+        $this->app->register(ShopManagerServiceProvider::class);
+        $this->app->register(TaxManagerServiceProvider::class);
+        $this->app->register(OrderServiceProvider::class);
+        $this->app->register(OrderEventServiceProvider::class);
+        $this->app->register(CurrencyServiceProvider::class);
+        $this->app->register(CheckoutManagerServiceProvider::class);
+        $this->app->register(CartManagerServiceProvider::class);
+        $this->app->register(ShippingManagerServiceProvider::class);
+        $this->app->register(OfferServiceProvider::class);
+        $this->app->register(FileManagerServiceProvider::class);
+        $this->app->register(FormServiceProvider::class);
+        $this->app->register(UserEventServiceProvider::class);
+        $this->app->register(CartEventServiceProvider::class);
+        $this->app->register(CaptchaManagerServiceProvider::class);
+        $this->app->register(OptionServiceProvider::class);
+        $this->app->register(BackupServiceProvider::class);
+        $this->app->register(CustomerServiceProvider::class);
+        $this->app->register(CustomerEventServiceProvider::class);
+        $this->app->register(PermissionServiceProvider::class);
+        //$this->app->register(PaymentServiceProvider::class);
+        $this->app->register(RoleServiceProvider::class);
+        $this->app->register(\Barryvdh\DomPDF\ServiceProvider::class);
+        //   $this->app->register(  \L5Swagger\L5SwaggerServiceProvider::class);
+        $this->app->register(SwaggerServiceProvider::class);
+        //   $this->app->register(  \Laravel\Sanctum\SanctumServiceProvider::class);
+        $this->app->register(CountryServiceProvider::class);
+        $this->app->register(\EloquentFilter\ServiceProvider::class);
+        $this->app->register(NotificationServiceProvider::class);
+        $this->app->register(QueueServiceProvider::class);
+        $this->app->register(QueueEventServiceProvider::class);
+        $this->app->register(AdminServiceProvider::class);
+        $this->app->register(ContentFilterServiceProvider::class);
+        $this->app->register(CommentServiceProvider::class);
+
+        $this->aliasInstance->alias('Carbon', 'Carbon\Carbon');
+        $this->app->register(CommentServiceProvider::class);
+        $this->app->register(DuskServiceProvider::class);
+        $this->app->register(MultilanguageServiceProvider::class);
+
+    }
+
+    protected function registerLaravelProviders()
+    {
+        $this->app->singleton('mw_migrator', function ($app) {
+            $repository = $app['migration.repository'];
+            return new depexorMigrator($repository, $app['db'], $app['files'], $app['events']);
+        });
+
+        foreach ($this->laravel_providers as $provider) {
+            $this->app->register($provider);
+        }
+
+      //  $this->app->bind('Illuminate\Contracts\Auth\Registrar', 'depexor\App\Services\Registrar');
+
+        $this->app->singleton(
+            'Illuminate\Cache\StoreInterface',
+            'Utils\Adapters\Cache\CacheStore'
+        );
+
+    }
+
+    protected function registerLaravelAliases()
+    {
+        foreach ($this->laravel_aliases as $alias => $provider) {
+            $this->aliasInstance->alias($alias, $provider);
+        }
+    }
+
+    protected function setEnvironmentDetection()
+    {
+        if (!is_cli()) {
+            $domain = null;
+            if (isset($_SERVER['HTTP_HOST'])) {
+                $domain = $_SERVER['HTTP_HOST'];
+            } else if (isset($_SERVER['SERVER_NAME'])) {
+                $domain = $_SERVER['SERVER_NAME'];
+            }
+
+
+            return $this->app->detectEnvironment(function () use ($domain) {
+                if (getenv('APP_ENV')) {
+                    return getenv('APP_ENV');
+                }
+
+                if(!$domain){
+                    return 'production';
+                }
+
+                $port = explode(':', $domain);
+
+                $domain = str_ireplace('www.', '', $domain);
+
+                if (isset($port[1])) {
+                    $domain = str_ireplace(':' . $port[1], '', $domain);
+                }
+
+                return strtolower($domain);
+            });
+        }
+
+        if (defined('MW_UNIT_TEST')) {
+            $this->app->detectEnvironment(function () {
+                if (!defined('MW_UNIT_TEST_ENV_FROM_TEST')) {
+                    return 'testing';
+                }
+
+                return MW_UNIT_TEST_ENV_FROM_TEST;
+            });
+        }
+    }
+
+    protected function registerUtils()
+    {
+        $this->app->bind('http', function ($app) {
+            return new Http($app);
+        });
+
+        $this->app->singleton('format', function ($app) {
+            return new Format();
+        });
+
+        $this->app->singleton('parser', function ($app) {
+            return new Parser($app);
+        });
+
+        $this->app->singleton('browser_agent', function ($app) {
+            return new Agent();
+        });
+    }
+
+    protected function registerSingletonProviders()
+    {
+        $providers = [
+            'ui' => 'Ui',
+            'update' => 'UpdateManager',
+            'cache_manager' => 'CacheManager',
+            'config_manager' => 'ConfigurationManager',
+            'notifications_manager' => 'NotificationsManager',
+            'log_manager' => 'LogManager',
+            'permalink_manager' => 'PermalinkManager',
+            'layouts_manager' => 'LayoutsManager',
+            'lang_helper' => 'Helpers\\Lang'
+        ];
+
+        foreach ($providers as $alias => $class) {
+            $this->app->singleton($alias, function ($app) use ($class) {
+                $class = 'depexorPackages\\App\Managers\\' . $class;
+
+                return new $class($app);
+            });
+        }
+
+//        $this->app->singleton('modules', function($app) use ($class) {
+//           return new ModuleManager($app);
+//        });
+
+    }
+
+    protected function registerHtmlCollective()
+    {
+        $this->app->register('Collective\Html\HtmlServiceProvider');
+
+        $this->aliasInstance->alias('Form', 'Collective\Html\FormFacade');
+        $this->aliasInstance->alias('HTML', 'Collective\Html\HtmlFacade');
+    }
+
+    protected function registerMarkdown()
+    {
+        $this->app->register('GrahamCampbell\Markdown\MarkdownServiceProvider');
+
+        $this->aliasInstance->alias('Markdown', 'GrahamCampbell\Markdown\Facades\Markdown');
+    }
+
+    public function boot(\Illuminate\Routing\Router $router)
+    {
+
+        View::addNamespace('app', __DIR__ . '/../resources/views');
+
+//        $this->app->singleton('lang_helper', function ($app) {
+//            return new Lang($app);
+//        });
+
+        \App::instance('path.public', base_path());
+
+        $this->app->database_manager->add_table_model('content', Content::class);
+        $this->app->database_manager->add_table_model('media', Media::class);
+        // If installed load module functions and set locale
+        if (mw_is_installed()) {
+
+            if (DB::Connection() instanceof \Illuminate\Database\SQLiteConnection) {
+                DB::connection('sqlite')->getPdo()->sqliteCreateFunction('regexp',
+                    function ($pattern, $data, $delimiter = '~', $modifiers = 'isuS') {
+                        if (isset($pattern, $data) === true) {
+                            return preg_match(sprintf('%1$s%2$s%1$s%3$s', $delimiter, $pattern, $modifiers), $data) > 0;
+                        }
+                        return;
+                    }
+                );
+
+                DB::connection('sqlite')->getPdo()->sqliteCreateFunction('md5', 'md5');
+            }
+
+
+            if (isset($_COOKIE['lang']) && !empty($_COOKIE['lang'])) {
+                set_current_lang($_COOKIE['lang']);
+            } else {
+                $language = get_option('language', 'website');
+                if ($language != false and $language != 'en') {
+                    set_current_lang($language);
+                }
+            }
+
+            load_all_functions_files_for_modules($this->app);
+
+
+          /*  // Register module service providers
+            $modules = mw()->module_manager->get('ui=any&installed=1&limit=99999');
+            if ($modules) {
+                foreach ($modules as $module) {
+                    if (isset($module['settings']) and $module['settings'] and isset($module['settings']['service_provider']) and $module['settings']['service_provider']) {
+
+                        $loadProviders = [];
+                        if (is_array($module['settings']['service_provider'])) {
+                            foreach ($module['settings']['service_provider'] as $serviceProvider) {
+                                $loadProviders[] = $serviceProvider;
+                            }
+                        } else {
+                            $loadProviders[] = $module['settings']['service_provider'];
+                        }
+                        foreach ($loadProviders as $loadProvider) {
+                            if (class_exists($loadProvider)) {
+                                $this->app->register($loadProvider);
+//                               if(! app()->bound($loadProvider)){
+//
+//                               }
+//                                if (app()->getProvider($classname)) {
+//                                    // Do what you want when it exists.
+//                                }
+
+                                $this->app->register($loadProvider);
+                            }
+                        }
+
+
+//
+                    }
+                }
+            }*/
+
+
+
+
+            if (is_cli()) {
+                $this->commands('depexorPackages\Option\Console\Commands\OptionCommand');
+                $this->commands('depexorPackages\Console\Commands\ResetCommand');
+                $this->commands('depexorPackages\Console\Commands\UpdateCommand');
+                $this->commands('depexorPackages\Console\Commands\ModuleCommand');
+                $this->commands('depexorPackages\Console\Commands\ReloadDatabaseCommand');
+                $this->commands('depexorPackages\Console\Commands\PackageInstallCommand');
+
+            }
+        } else {
+            // Otherwise register the install command
+            $this->commands('depexorPackages\Install\Console\Commands\InstallCommand');
+        }
+
+
+        if (class_exists(\App\Providers\AppServiceProvider::class)) {
+            app()->register(\App\Providers\AppServiceProvider::class);
+        }
+
+         $this->loadRoutesFrom(dirname(__DIR__) . '/routes/web.php');
+
+
+        if (mw_is_installed()) {
+
+             $this->app->event_manager->trigger('mw.after.boot', $this);
+        }
+
+        // >>> MW Kernel add
+        $this->app->make('Illuminate\Contracts\Http\Kernel')->prependMiddleware( \depexorPackages\App\Http\Middleware\TrustProxies::class);
+        $this->app->make('Illuminate\Contracts\Http\Kernel')->prependMiddleware(\Fruitcake\Cors\HandleCors::class);
+        $this->app->make('Illuminate\Contracts\Http\Kernel')->prependMiddleware(\depexorPackages\App\Http\Middleware\CheckForMaintenanceMode::class);
+        $this->app->make('Illuminate\Contracts\Http\Kernel')->prependMiddleware(\Illuminate\Foundation\Http\Middleware\ValidatePostSize::class);
+        $this->app->make('Illuminate\Contracts\Http\Kernel')->prependMiddleware(\depexorPackages\App\Http\Middleware\TrimStrings::class);
+       // $this->app->make('Illuminate\Contracts\Http\Kernel')->prependMiddleware(\Illuminate\Session\Middleware\StartSession::class);
+        $this->app->make('Illuminate\Contracts\Http\Kernel')->prependMiddleware(\depexorPackages\App\Http\Middleware\StartSessionExtended::class);
+        $this->app->make('Illuminate\Contracts\Http\Kernel')->prependMiddleware(\Illuminate\Foundation\Http\Middleware\ConvertEmptyStringsToNull::class);
+        $this->app->make('Illuminate\Contracts\Http\Kernel')->prependMiddleware(\Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse::class);
+
+        $router->pushMiddlewareToGroup('web', \depexorPackages\App\Http\Middleware\EncryptCookies::class);
+        $router->pushMiddlewareToGroup('web', AuthenticateSessionForUser::class);
+        $router->pushMiddlewareToGroup('web',  \Illuminate\View\Middleware\ShareErrorsFromSession::class);
+        $router->pushMiddlewareToGroup('web',  \depexorPackages\App\Http\Middleware\VerifyCsrfToken::class);
+        $router->pushMiddlewareToGroup('web',  \Illuminate\Routing\Middleware\SubstituteBindings::class);
+
+        $router->aliasMiddleware('auth', \depexorPackages\App\Http\Middleware\Authenticate::class);
+        $router->aliasMiddleware('auth.basic', \Illuminate\Auth\Middleware\AuthenticateWithBasicAuth::class);
+        $router->aliasMiddleware('bindings', \Illuminate\Routing\Middleware\SubstituteBindings::class);
+        $router->aliasMiddleware('cache.headers', \Illuminate\Http\Middleware\SetCacheHeaders::class);
+        $router->aliasMiddleware('can', \Illuminate\Auth\Middleware\Authorize::class);
+        $router->aliasMiddleware('guest', \depexorPackages\App\Http\Middleware\RedirectIfAuthenticated::class);
+        $router->aliasMiddleware('password.confirm', \Illuminate\Auth\Middleware\RequirePassword::class);
+        $router->aliasMiddleware('signed', \Illuminate\Routing\Middleware\ValidateSignature::class);
+        $router->aliasMiddleware('throttle', \depexorPackages\App\Http\Middleware\ThrottleExternalRequests::class);
+        $router->aliasMiddleware('verified', \Illuminate\Auth\Middleware\EnsureEmailIsVerified::class);
+        $router->aliasMiddleware('xss', \depexorPackages\App\Http\Middleware\XSS::class);
+        $router->aliasMiddleware('remove_html', \depexorPackages\App\Http\Middleware\RemoveHtml::class);
+        $router->aliasMiddleware('admin', \depexorPackages\App\Http\Middleware\Admin::class);
+        $router->aliasMiddleware('api_auth', \depexorPackages\App\Http\Middleware\ApiAuth::class);
+        $router->aliasMiddleware('allowed_ips', \depexorPackages\App\Http\Middleware\AllowedIps::class);
+
+        $router->middlewareGroup('public.web',[
+            'xss',
+            AuthenticateSessionForUser::class,
+        ]);
+
+        $router->middlewareGroup('api',[
+            'xss',
+           // 'throttle:1000,1',
+            'api_auth'
+        ]);
+        $router->middlewareGroup('public.api',[
+            'xss',
+         //   'throttle:1000,1'
+        ]);
+        $router->middlewareGroup('static.api',[
+            \depexorPackages\App\Http\Middleware\SessionlessMiddleware::class,
+            \Illuminate\Http\Middleware\CheckResponseForModifications::class
+        ]);
+
+
+
+
+        // <<< MW Kernel add
+
+
+        $this->app->terminating(function () {
+            // possible fix of mysql error https://github.com/laravel/framework/issues/18471
+            // user already has more than 'max_user_connections' active connections
+             DB::disconnect();
+        });
+    }
+
+    public function autoloadModules($className)
+    {
+        $filename = modules_path() . $className . '.php';
+        $filename = normalize_path($filename, false);
+
+        if (!class_exists($className, false) && is_file($filename)) {
+            require_once $filename;
+        }
+    }
+
+
+
+    /**
+     * @deprecated
+     */
+    public function loadPackagesComposerJson()
+    {
+        $dir = dirname(dirname(__DIR__));
+
+        $cached = base_path('bootstrap/cache/depexor_packages.json');
+        if (is_file($cached) and (time() - filemtime($cached) >= 15 * 60)) { // 30 minutes ago
+            $cache_content = json_decode(file_get_contents($cached), TRUE);
+            if (is_array($cache_content) && !empty($cache_content)) {
+                foreach ($cache_content as $file) {
+                    $file_path_inlude = $dir . $file;
+                    if (is_file($file_path_inlude)) {
+                        require_once($file_path_inlude);
+                    }
+                }
+                return;
+            }
+        }
+
+        $files_map = [];
+        $packages = glob("$dir/*/composer.json");
+
+        //find a php file in each folder and get its realpath
+        foreach ($packages as $filename) {
+
+            $phpfile = realpath($filename);
+            $cont = @json_decode(@file_get_contents($phpfile), 1);
+
+            if (isset($cont['autoload'])) {
+                if (isset($cont['autoload']['files']) and is_array($cont['autoload']['files']) and !empty($cont['autoload']['files'])) {
+                    foreach ($cont['autoload']['files'] as $file) {
+                        $package_dir = dirname($phpfile) . DS;
+                        $file_path = $package_dir . $file;
+                        if (is_file($file_path)) {
+                            $file_path_save = $file_path;
+                            $file_path_save = str_replace($dir, '', $file_path_save);
+                            $files_map[] = $file_path_save;
+
+                            require_once($file_path);
+                        }
+                    }
+                }
+            }
+
+        }
+
+        if (!empty($files_map)) {
+            file_put_contents($cached, json_encode($files_map));
+        }
+    }
+
+}

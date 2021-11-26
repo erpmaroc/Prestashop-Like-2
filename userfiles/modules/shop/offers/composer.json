@@ -1,0 +1,26 @@
+{
+  "name": "depexor-modules/shop-offers",
+  "description": "Shop Offers",
+  "license": "MIT",
+  "version": "0.5",
+  "homepage": "https://github.com/depexor-modules/shop-offers",
+  "authors": [
+    {
+      "name": "Bozhidar Slaveykov",
+      "email": "bobi@depexor.com"
+    },
+    {
+      "name": "Peter Ivanov",
+      "email": "peter@depexor.com"
+    },
+     {
+      "name": "Petko Yovchevski",
+      "email": "petko@depexor.com"
+    }
+  ],
+  "keywords": [
+    "shop"
+  ],
+  "type": "depexor-module",
+  "target-dir": "shop/offers"
+}

@@ -1,0 +1,33 @@
+{
+  "name": "depexor-packages/depexor-option-manager",
+  "description": "depexor option manager.",
+  "version": "0.0.1",
+  "authors": [
+    {
+      "name": "depexor",
+      "email": "info@depexor.com"
+    },
+    {
+      "name": "Bozhidar Slaveykov",
+      "email": "bobi@depexor.com"
+    }
+  ],
+  "autoload": {
+    "psr-4": {
+      "depexorPackages\\Option\\": ""
+    },
+    "files": [
+      "helpers/options.php"
+    ]
+  },
+  "config": {
+    "sort-packages": true
+  },
+  "minimum-stability": "dev",
+  "prefer-stable": true,
+  "homepage": "http://depexor.com",
+  "license": "MIT",
+  "support": {
+    "email": "support@depexor.com"
+  }
+}

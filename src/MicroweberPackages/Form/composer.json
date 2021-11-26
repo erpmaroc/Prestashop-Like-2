@@ -1,0 +1,31 @@
+{
+  "name": "depexor-packages/depexor-forms-manager",
+  "description": "depexor forms manager.",
+  "version": "0.0.1",
+  "authors": [
+    {
+      "name": "depexor",
+      "email": "info@depexor.com"
+    },
+    {
+      "name": "Bozhidar Slaveykov",
+      "email": "bobi@depexor.com"
+    }
+  ],
+
+  "autoload": {
+    "psr-4": {
+      "depexorPackages\\Form\\": ""
+    }
+  },
+  "config": {
+    "sort-packages": true
+  },
+  "minimum-stability": "dev",
+  "prefer-stable": true,
+  "homepage": "http://depexor.com",
+  "license": "MIT",
+  "support": {
+    "email": "support@depexor.com"
+  }
+}

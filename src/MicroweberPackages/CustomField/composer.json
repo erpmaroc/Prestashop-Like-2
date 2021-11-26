@@ -1,0 +1,28 @@
+{
+  "name": "depexor-packages/depexor-custom-field",
+  "description": "Config rewrite for Laravel. Allows to save key and values in cofig files.",
+  "version": "0.0.1",
+  "authors": [
+    {
+      "name": "depexor",
+      "email": "info@depexor.com"
+    },
+    {
+      "name": "Bozhidar Slaveykov",
+      "email": "bobi@depexor.com"
+    }
+  ],
+  "autoload": {
+    "psr-4": {
+      "depexorPackages\\CustomField\\": ""
+    },
+    "files": [
+      "helpers/custom_fields.php"
+    ]
+  },
+  "homepage": "http://depexor.com",
+  "license": "MIT",
+  "support": {
+    "email": "support@depexor.com"
+  }
+}

@@ -1,0 +1,11 @@
+{
+    "name": "depexor-modules/comments",
+    "description": "Comments for depexor CMS",
+    "type": "metapackage",
+    
+    "autoload": {
+        "psr-4": {
+            "depexor\\Comments\\": "src/"
+        }
+    }
+}

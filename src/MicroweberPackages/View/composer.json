@@ -1,0 +1,25 @@
+{
+    "name": "depexor-packages/depexor-view",
+    "description": "Config rewrite for Laravel. Allows to save key and values in cofig files.",
+    "version" : "0.0.1",
+    "authors": [
+        {
+            "name": "depexor",
+            "email": "info@depexor.com"
+        },
+		{
+            "name": "Bozhidar Slaveykov",
+            "email": "bobi@depexor.com"
+        }
+  ],
+  "autoload": {
+      "psr-4": {
+        "depexorPackages\\View\\": ""
+      }
+  },
+  "homepage": "http://depexor.com",
+  "license": "MIT",
+  "support": {
+    "email": "support@depexor.com"
+  }
+}

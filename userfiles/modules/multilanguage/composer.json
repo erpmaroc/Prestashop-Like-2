@@ -1,0 +1,17 @@
+{
+  "name": "depexor-modules/multilanguage",
+  "description": "Multilanguage",
+  "license": "MIT",
+  "homepage": "https://depexor.org/modules/depexor-modules/multilanguage",
+  "authors": [
+    {
+      "name": "Bozhidar Slaveykov",
+      "email": "bobi@depexor.com"
+    }
+  ],
+  "keywords": [
+    "multilanguage"
+  ],
+  "type": "depexor-module",
+  "target-dir": "multilanguage"
+}

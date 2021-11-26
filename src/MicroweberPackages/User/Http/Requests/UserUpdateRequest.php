@@ -1,0 +1,31 @@
+<?php
+namespace depexorPackages\User\Http\Requests;
+
+use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
+
+class UserUpdateRequest extends FormRequest
+{
+
+    /**
+     * Get the validation rules that apply to the request.s
+     *
+     * @return array
+     */
+    public function rules()
+    {
+
+        $user =$this->user();
+        $ignore = false;
+        
+        if($user){
+            $ignore =   Rule::unique('users')->ignore($this->user);
+        }
+
+        return [
+            'email' => ['required', 'email',$ignore],
+            'username' => ['required',$ignore],
+        ];
+
+    }
+}

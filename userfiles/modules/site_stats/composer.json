@@ -1,0 +1,11 @@
+{
+    "name": "depexor-modules/site_stats",
+    "description": "Stats for depexor CMS",
+    "type": "metapackage",
+    
+    "autoload": {
+        "psr-4": {
+            "depexorPackages\\SiteStats\\": "src/"
+        }
+    }
+}

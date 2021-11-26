@@ -1,0 +1,31 @@
+{
+  "name": "depexor-packages/depexor-checkout-manager",
+  "description": "depexor CMS.",
+  "version": "0.0.1",
+  "authors": [
+    {
+      "name": "depexor",
+      "email": "info@depexor.com"
+    },
+    {
+      "name": "Bozhidar Slaveykov",
+      "email": "bobi@depexor.com"
+    }
+  ],
+
+  "autoload": {
+    "psr-4": {
+      "depexorPackages\\Checkout\\": ""
+    }
+  },
+  "config": {
+    "sort-packages": true
+  },
+  "minimum-stability": "dev",
+  "prefer-stable": true,
+  "homepage": "http://depexor.com",
+  "license": "MIT",
+  "support": {
+    "email": "support@depexor.com"
+  }
+}

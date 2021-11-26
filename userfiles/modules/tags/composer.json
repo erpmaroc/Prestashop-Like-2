@@ -1,0 +1,17 @@
+{
+  "name": "depexor-modules/tags",
+  "description": "Tags",
+  "license": "MIT",
+  "homepage": "https://depexor.org/modules/depexor-modules/tags",
+  "authors": [
+    {
+      "name": "Bozhidar Slaveykov",
+      "email": "bobi@depexor.com"
+    }
+  ],
+  "keywords": [
+    "tags"
+  ],
+  "type": "depexor-module",
+  "target-dir": "tags"
+}
